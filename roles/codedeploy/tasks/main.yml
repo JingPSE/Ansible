@@ -1,40 +1,11 @@
 ---
-- name: "Install Packages | pip"
-  pip:
-    state: present
-    name: "{{ item }}"
-  with_items:
-    - awscli
-  tags:
-    - codedeploy
-
-- name: "Get Instance Metadata | ec2"
-  action: ec2_facts
-  tags:
-    - codedeploy
-
-- name: "Get CodeDeploy | s3"
+- name: Download CodeDeploy Agent
   get_url:
     url: "https://aws-codedeploy-us-east-2.s3.amazonaws.com/latest/install"
-    dest: /tmp/codedeploy-installd
-  tags:
-    - codedeploy
-
-- name: "Codedeploy Install Binary | Permission Executable"
-  file:
-    state: file
-    path: /tmp/codedeploy-install
-    group: root
-    owner: root
+    dest: /tmp/codedeploy-install
     mode: 0755
-  when: is_codedeploy_installed|failed
-  tags:
-    - codedeploy
 
-- name: "Codedeploy Install"
+- name: Codedeploy Install
   become: true
   command: /tmp/codedeploy-install auto
-  when: is_codedeploy_installed|failed
-  tags:
-    - codedeploy
 
