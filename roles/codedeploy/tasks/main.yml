@@ -17,4 +17,4 @@
 
 - name: Codedeploy Install
   become: true
-command: /tmp/codedeploy-install auto 
+  command: /tmp/codedeploy-install auto 
