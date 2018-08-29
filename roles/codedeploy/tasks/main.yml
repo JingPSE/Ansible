@@ -46,5 +46,5 @@
   command: /tmp/codedeploy-install auto
   when: is_codedeploy_installed|failed
   tags:
-- codedeploy
+    - codedeploy
 
