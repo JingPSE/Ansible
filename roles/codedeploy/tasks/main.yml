@@ -16,8 +16,7 @@
 - name: "Get CodeDeploy | s3"
   get_url:
     url: "https://aws-codedeploy-us-east-2.s3.amazonaws.com/latest/install"
-    dest: /tmp/codedeploy-install
-  when: is_codedeploy_installed|failed
+    dest: /tmp/codedeploy-installd
   tags:
     - codedeploy
 
