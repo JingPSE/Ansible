@@ -1,20 +1,50 @@
 ---
-# tasks file for aptoma.aws-codedeploy
-- name: Install Packages
-  become: true
-  apt:
-    state: latest
-    name: "{{ item }}"
-    update_cache: yes
-  with_items:
-    - ruby
+- name: "Load variables specific to this OS"
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - codedeploy
 
-- name: Download CodeDeploy Agent
+- include: "{{ ansible_os_family }}.yml"
+  tags:
+    - codedeploy
+
+- name: "Install Packages | pip"
+  pip:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - awscli
+  tags:
+    - codedeploy
+
+- name: "Get Instance Metadata | ec2"
+  action: ec2_facts
+  tags:
+    - codedeploy
+
+- name: "Get CodeDeploy | s3"
   get_url:
     url: "https://aws-codedeploy-us-east-2.s3.amazonaws.com/latest/install"
     dest: /tmp/codedeploy-install
-    mode: 0755
+  when: is_codedeploy_installed|failed
+  tags:
+    - codedeploy
 
-- name: Codedeploy Install
+- name: "Codedeploy Install Binary | Permission Executable"
+  file:
+    state: file
+    path: /tmp/codedeploy-install
+    group: root
+    owner: root
+    mode: 0755
+  when: is_codedeploy_installed|failed
+  tags:
+    - codedeploy
+
+- name: "Codedeploy Install"
   become: true
-  command: /tmp/codedeploy-install auto 
+  command: /tmp/codedeploy-install auto
+  when: is_codedeploy_installed|failed
+  tags:
+- codedeploy
+
